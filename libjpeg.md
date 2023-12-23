@@ -1,15 +1,15 @@
-USING THE IJG JPEG LIBRARY
+# USING THE IJG JPEG LIBRARY
 
-Copyright (C) 1994-2019, Thomas G. Lane, Guido Vollbeding.
-This file is part of the Independent JPEG Group's software.
+Copyright (C) 1994-2019, Thomas G. Lane, Guido Vollbeding.  
+This file is part of the Independent JPEG Group's software.  
 For conditions of distribution and use, see the accompanying README file.
 
 
 This file describes how to use the IJG JPEG library within an application
 program.  Read it if you want to write a program that uses the library.
 
-The file example.c provides heavily commented skeleton code for calling the
-JPEG library.  Also see jpeglib.h (the include file to be used by application
+The file `example.c` provides heavily commented skeleton code for calling the
+JPEG library.  Also see `jpeglib.h` (the include file to be used by application
 programs) for full details about data structures and function parameter lists.
 The library source code, of course, is the ultimate reference.
 
@@ -24,33 +24,33 @@ improvements justify this.
 TABLE OF CONTENTS
 -----------------
 
-Overview:
-	Functions provided by the library
-	Outline of typical usage
-Basic library usage:
-	Data formats
-	Compression details
-	Decompression details
-	Mechanics of usage: include files, linking, etc
-Advanced features:
-	Compression parameter selection
-	Decompression parameter selection
-	Special color spaces
-	Error handling
-	Compressed data handling (source and destination managers)
-	I/O suspension
-	Progressive JPEG support
-	Buffered-image mode
-	Abbreviated datastreams and multiple images
-	Special markers
-	Raw (downsampled) image data
-	Really raw data: DCT coefficients
-	Progress monitoring
-	Memory management
-	Memory usage
-	Library compile-time options
-	Portability considerations
-	Notes for MS-DOS implementors
+Overview:  
+&emsp;Functions provided by the library  
+&emsp;Outline of typical usage  
+Basic library usage:  
+&emsp;Data formats  
+&emsp;Compression details  
+&emsp;Decompression details  
+&emsp;Mechanics of usage: include files, linking, etc  
+Advanced features:  
+&emsp;Compression parameter selection  
+&emsp;Decompression parameter selection  
+&emsp;Special color spaces  
+&emsp;Error handling  
+&emsp;Compressed data handling (source and destination managers)  
+&emsp;I/O suspension  
+&emsp;Progressive JPEG support  
+&emsp;Buffered-image mode  
+&emsp;Abbreviated datastreams and multiple images  
+&emsp;Special markers  
+&emsp;Raw (downsampled) image data  
+&emsp;Really raw data: DCT coefficients  
+&emsp;Progress monitoring  
+&emsp;Memory management  
+&emsp;Memory usage  
+&emsp;Library compile-time options  
+&emsp;Portability considerations  
+&emsp;Notes for MS-DOS implementors  
 
 You should read at least the overview and basic usage sections before trying
 to program with the library.  The sections on advanced features can be read
@@ -90,11 +90,11 @@ nonetheless, they are useful for viewers.
 A word about functions *not* provided by the library.  We handle a subset of
 the ISO JPEG standard; most baseline, extended-sequential, and progressive
 JPEG processes are supported.  (Our subset includes all features now in common
-use.)  Unsupported ISO options include:
-	* Hierarchical storage
-	* Lossless JPEG
-	* DNL marker
-	* Nonintegral subsampling ratios
+use.)  Unsupported ISO options include:  
+&emsp;* Hierarchical storage  
+&emsp;* Lossless JPEG  
+&emsp;* DNL marker  
+&emsp;* Nonintegral subsampling ratios  
 We support 8-bit to 12-bit data precision, but this is a compile-time choice
 rather than a run-time choice; hence it is difficult to use different
 precisions in a single application.
@@ -111,14 +111,16 @@ Outline of typical usage
 
 The rough outline of a JPEG compression operation is:
 
-	Allocate and initialize a JPEG compression object
-	Specify the destination for the compressed data (eg, a file)
-	Set parameters for compression, including image size & colorspace
-	jpeg_start_compress(...);
-	while (scan lines remain to be written)
-		jpeg_write_scanlines(...);
-	jpeg_finish_compress(...);
-	Release the JPEG compression object
+```c
+Allocate and initialize a JPEG compression object
+Specify the destination for the compressed data (eg, a file)
+Set parameters for compression, including image size & colorspace
+jpeg_start_compress(...);
+while (scan lines remain to be written)
+	jpeg_write_scanlines(...);
+jpeg_finish_compress(...);
+Release the JPEG compression object
+```
 
 A JPEG compression object holds parameters and working state for the JPEG
 library.  We make creation/destruction of the object separate from starting
@@ -128,7 +130,7 @@ same parameter settings for a sequence of images.  Re-use of a JPEG object
 also has important implications for processing abbreviated JPEG datastreams,
 as discussed later.
 
-The image data to be compressed is supplied to jpeg_write_scanlines() from
+The image data to be compressed is supplied to `jpeg_write_scanlines()` from
 in-memory buffers.  If the application is doing file-to-file compression,
 reading image data from the source file is the application's responsibility.
 The library emits compressed data by calling a "data destination manager",
@@ -137,15 +139,17 @@ provide its own destination manager to do something else.
 
 Similarly, the rough outline of a JPEG decompression operation is:
 
-	Allocate and initialize a JPEG decompression object
-	Specify the source of the compressed data (eg, a file)
-	Call jpeg_read_header() to obtain image info
-	Set parameters for decompression
-	jpeg_start_decompress(...);
-	while (scan lines remain to be read)
-		jpeg_read_scanlines(...);
-	jpeg_finish_decompress(...);
-	Release the JPEG decompression object
+```c
+Allocate and initialize a JPEG decompression object
+Specify the source of the compressed data (eg, a file)
+Call jpeg_read_header() to obtain image info
+Set parameters for decompression
+jpeg_start_decompress(...);
+while (scan lines remain to be read)
+	jpeg_read_scanlines(...);
+jpeg_finish_decompress(...);
+Release the JPEG decompression object
+```
 
 This is comparable to the compression outline except that reading the
 datastream header is a separate step.  This is helpful because information
@@ -156,15 +160,15 @@ output scaling ratio that will fit the image into the available screen size.
 The decompression library obtains compressed data by calling a data source
 manager, which typically will read the data from a file; but other behaviors
 can be obtained with a custom source manager.  Decompressed data is delivered
-into in-memory buffers passed to jpeg_read_scanlines().
+into in-memory buffers passed to `jpeg_read_scanlines()`.
 
 It is possible to abort an incomplete compression or decompression operation
-by calling jpeg_abort(); or, if you do not need to retain the JPEG object,
-simply release it by calling jpeg_destroy().
+by calling `jpeg_abort()`; or, if you do not need to retain the JPEG object,
+simply release it by calling `jpeg_destroy()`.
 
 JPEG compression and decompression objects are two separate struct types.
 However, they share some common fields, and certain routines such as
-jpeg_destroy() can work on either type of object.
+`jpeg_destroy()` can work on either type of object.
 
 The JPEG library has no static variables: all state is in the compression
 or decompression object.  Therefore it is possible to process multiple
@@ -203,17 +207,17 @@ and the other references mentioned in the README file.
 
 Pixels are stored by scanlines, with each scanline running from left to
 right.  The component values for each pixel are adjacent in the row; for
-example, R,G,B,R,G,B,R,G,B,... for 24-bit RGB color.  Each scanline is an
-array of data type JSAMPLE --- which is typically "unsigned char", unless
-you've changed jmorecfg.h.  (You can also change the RGB pixel layout, say
-to B,G,R order, by modifying jmorecfg.h.  But see the restrictions listed in
+example, `R,G,B,R,G,B,R,G,B,...` for 24-bit RGB color.  Each scanline is an
+array of data type `JSAMPLE` --- which is typically `unsigned char`, unless
+you've changed `jmorecfg.h`.  (You can also change the RGB pixel layout, say
+to B,G,R order, by modifying `jmorecfg.`h.  But see the restrictions listed in
 that file before doing so.)
 
 A 2-D array of pixels is formed by making a list of pointers to the starts of
 scanlines; so the scanlines need not be physically adjacent in memory.  Even
 if you process just one scanline at a time, you must make a one-element
-pointer array to conform to this structure.  Pointers to JSAMPLE rows are of
-type JSAMPROW, and the pointer to the pointer array is of type JSAMPARRAY.
+pointer array to conform to this structure.  Pointers to `JSAMPLE` rows are of
+type `JSAMPROW`, and the pointer to the pointer array is of type `JSAMPARRAY`.
 
 The library accepts or supplies one or more complete scanlines per call.
 It is not possible to process part of a row at a time.  Scanlines are always
@@ -222,10 +226,10 @@ have it all in memory, but usually it's simplest to process one scanline at
 a time.
 
 For best results, source data values should have the precision specified by
-BITS_IN_JSAMPLE (normally 8 bits).  For instance, if you choose to compress
+`BITS_IN_JSAMPLE` (normally 8 bits).  For instance, if you choose to compress
 data that's only 6 bits/channel, you should left-justify each value in a
 byte before passing it to the compressor.  If you need to compress data
-that has more than 8 bits/channel, compile with BITS_IN_JSAMPLE = 9 to 12.
+that has more than 8 bits/channel, compile with `BITS_IN_JSAMPLE = 9 to 12`.
 (See "Library compile-time options", later.)
 
 
@@ -233,12 +237,12 @@ The data format returned by the decompressor is the same in all details,
 except that colormapped output is supported.  (Again, a JPEG file is never
 colormapped.  But you can ask the decompressor to perform on-the-fly color
 quantization to deliver colormapped output.)  If you request colormapped
-output then the returned data array contains a single JSAMPLE per pixel;
+output then the returned data array contains a single `JSAMPLE` per pixel;
 its value is an index into a color map.  The color map is represented as
-a 2-D JSAMPARRAY in which each row holds the values of one color component,
-that is, colormap[i][j] is the value of the i'th color component for pixel
+a 2-D `JSAMPARRAY` in which each row holds the values of one color component,
+that is, `colormap[i][j]` is the value of the i'th color component for pixel
 value (map index) j.  Note that since the colormap indexes are stored in
-JSAMPLEs, the maximum number of colors is limited by the size of JSAMPLE
+`JSAMPLEs`, the maximum number of colors is limited by the size of `JSAMPLE`
 (ie, at most 256 colors for an 8-bit JPEG library).
 
 
@@ -249,34 +253,36 @@ Here we revisit the JPEG compression outline given in the overview.
 
 1. Allocate and initialize a JPEG compression object.
 
-A JPEG compression object is a "struct jpeg_compress_struct".  (It also has
-a bunch of subsidiary structures which are allocated via malloc(), but the
+A JPEG compression object is a `struct jpeg_compress_struct`.  (It also has
+a bunch of subsidiary structures which are allocated via `malloc()`, but the
 application doesn't control those directly.)  This struct can be just a local
 variable in the calling routine, if a single routine is going to execute the
 whole JPEG compression sequence.  Otherwise it can be static or allocated
-from malloc().
+from `malloc()`.
 
 You will also need a structure representing a JPEG error handler.  The part
-of this that the library cares about is a "struct jpeg_error_mgr".  If you
+of this that the library cares about is a `struct jpeg_error_mgr`.  If you
 are providing your own error handler, you'll typically want to embed the
-jpeg_error_mgr struct in a larger structure; this is discussed later under
+`jpeg_error_mgr` struct in a larger structure; this is discussed later under
 "Error handling".  For now we'll assume you are just using the default error
 handler.  The default error handler will print JPEG error/warning messages
-on stderr, and it will call exit() if a fatal error occurs.
+on stderr, and it will call `exit()` if a fatal error occurs.
 
 You must initialize the error handler structure, store a pointer to it into
-the JPEG object's "err" field, and then call jpeg_create_compress() to
+the JPEG object's "err" field, and then call `jpeg_create_compress()` to
 initialize the rest of the JPEG object.
 
 Typical code for this step, if you are using the default error handler, is
 
-	struct jpeg_compress_struct cinfo;
-	struct jpeg_error_mgr jerr;
-	...
-	cinfo.err = jpeg_std_error(&jerr);
-	jpeg_create_compress(&cinfo);
+```c
+struct jpeg_compress_struct cinfo;
+struct jpeg_error_mgr jerr;
+...
+cinfo.err = jpeg_std_error(&jerr);
+jpeg_create_compress(&cinfo);
+```
 
-jpeg_create_compress allocates a small amount of memory, so it could fail
+`jpeg_create_compress` allocates a small amount of memory, so it could fail
 if you are out of memory.  In that case it will exit via the error handler;
 that's why the error handler must be initialized first.
 
@@ -285,32 +291,34 @@ that's why the error handler must be initialized first.
 
 As previously mentioned, the JPEG library delivers compressed data to a
 "data destination" module.  The library includes one data destination
-module which knows how to write to a stdio stream.  You can use your own
+module which knows how to write to a `stdio` stream.  You can use your own
 destination module if you want to do something else, as discussed later.
 
 If you use the standard destination module, you must open the target stdio
 stream beforehand.  Typical code for this step looks like:
 
-	FILE * outfile;
-	...
-	if ((outfile = fopen(filename, "wb")) == NULL) {
-	    fprintf(stderr, "can't open %s\n", filename);
-	    exit(1);
-	}
-	jpeg_stdio_dest(&cinfo, outfile);
+```c
+FILE * outfile;
+...
+if ((outfile = fopen(filename, "wb")) == NULL) {
+	fprintf(stderr, "can't open %s\n", filename);
+	exit(1);
+}
+jpeg_stdio_dest(&cinfo, outfile);
+```
 
 where the last line invokes the standard destination module.
 
 WARNING: it is critical that the binary compressed data be delivered to the
 output file unchanged.  On non-Unix systems the stdio library may perform
 newline translation or otherwise corrupt binary data.  To suppress this
-behavior, you may need to use a "b" option to fopen (as shown above), or use
-setmode() or another routine to put the stdio stream in binary mode.  See
-cjpeg.c and djpeg.c for code that has been found to work on many systems.
+behavior, you may need to use a "b" option to `fopen` (as shown above), or use
+`setmode()` or another routine to put the stdio stream in binary mode.  See
+`cjpeg.c` and `djpeg.c` for code that has been found to work on many systems.
 
 You can select the data destination after setting other parameters (step 3),
 if that's more convenient.  You may not change the destination between
-calling jpeg_start_compress() and jpeg_finish_compress().
+calling `jpeg_start_compress()` and `jpeg_finish_compress()`.
 
 
 3. Set parameters for compression, including image size & colorspace.
@@ -318,67 +326,72 @@ calling jpeg_start_compress() and jpeg_finish_compress().
 You must supply information about the source image by setting the following
 fields in the JPEG object (cinfo structure):
 
-	image_width		Width of image, in pixels
-	image_height		Height of image, in pixels
-	input_components	Number of color channels (samples per pixel)
-	in_color_space		Color space of source image
+```c
+image_width         Width of image, in pixels
+image_height        Height of image, in pixels
+input_components    Number of color channels (samples per pixel)
+in_color_space      Color space of source image
+```
 
 The image dimensions are, hopefully, obvious.  JPEG supports image dimensions
 of 1 to 64K pixels in either direction.  The input color space is typically
-RGB or grayscale, and input_components is 3 or 1 accordingly.  (See "Special
-color spaces", later, for more info.)  The in_color_space field must be
-assigned one of the J_COLOR_SPACE enum constants, typically JCS_RGB or
-JCS_GRAYSCALE.
+RGB or grayscale, and `input_components` is 3 or 1 accordingly.  (See "Special
+color spaces", later, for more info.)  The `in_color_space` field must be
+assigned one of the `J_COLOR_SPACE` enum constants, typically `JCS_RGB` or
+`JCS_GRAYSCALE`.
 
 JPEG has a large number of compression parameters that determine how the
 image is encoded.  Most applications don't need or want to know about all
 these parameters.  You can set all the parameters to reasonable defaults by
-calling jpeg_set_defaults(); then, if there are particular values you want
+calling `jpeg_set_defaults()`; then, if there are particular values you want
 to change, you can do so after that.  The "Compression parameter selection"
 section tells about all the parameters.
 
-You must set in_color_space correctly before calling jpeg_set_defaults(),
+You must set `in_color_space` correctly before calling `jpeg_set_defaults()`,
 because the defaults depend on the source image colorspace.  However the
 other three source image parameters need not be valid until you call
-jpeg_start_compress().  There's no harm in calling jpeg_set_defaults() more
+`jpeg_start_compress()`.  There's no harm in calling `jpeg_set_defaults()` more
 than once, if that happens to be convenient.
 
 Typical code for a 24-bit RGB source image is
 
-	cinfo.image_width = Width; 	/* image width and height, in pixels */
-	cinfo.image_height = Height;
-	cinfo.input_components = 3;	/* # of color components per pixel */
-	cinfo.in_color_space = JCS_RGB; /* colorspace of input image */
+```c
+cinfo.image_width = Width; 	/* image width and height, in pixels */
+cinfo.image_height = Height;
+cinfo.input_components = 3;	/* # of color components per pixel */
+cinfo.in_color_space = JCS_RGB; /* colorspace of input image */
 
-	jpeg_set_defaults(&cinfo);
-	/* Make optional parameter settings here */
+jpeg_set_defaults(&cinfo);
+/* Make optional parameter settings here */
+```
 
-
-4. jpeg_start_compress(...);
+4. `jpeg_start_compress(...);`
 
 After you have established the data destination and set all the necessary
-source image info and other parameters, call jpeg_start_compress() to begin
+source image info and other parameters, call `jpeg_start_compress()` to begin
 a compression cycle.  This will initialize internal state, allocate working
 storage, and emit the first few bytes of the JPEG datastream header.
 
 Typical code:
 
-	jpeg_start_compress(&cinfo, TRUE);
+```c
+jpeg_start_compress(&cinfo, TRUE);
+```
 
 The "TRUE" parameter ensures that a complete JPEG interchange datastream
 will be written.  This is appropriate in most cases.  If you think you might
 want to use an abbreviated datastream, read the section on abbreviated
 datastreams, below.
 
-Once you have called jpeg_start_compress(), you may not alter any JPEG
+Once you have called `jpeg_start_compress()`, you may not alter any JPEG
 parameters or other fields of the JPEG object until you have completed
 the compression cycle.
 
 
-5. while (scan lines remain to be written)
-	jpeg_write_scanlines(...);
+5.  `while (scan lines remain to be written)`  
+    `jpeg_write_scanlines(...);`
 
-Now write all the required image data by calling jpeg_write_scanlines()
+Now write all the required image data by calling `jpeg_write_scanlines()`
 one or more times.  You can pass one or more scanlines in each call, up
 to the total image height.  In most applications it is convenient to pass
 just one or a few scanlines at a time.  The expected format for the passed
@@ -390,64 +403,68 @@ terms (a curious interpretation of the English language...) but if you want
 your files to be compatible with everyone else's, you WILL use top-to-bottom
 order.  If the source data must be read in bottom-to-top order, you can use
 the JPEG library's virtual array mechanism to invert the data efficiently.
-Examples of this can be found in the sample application cjpeg.
+Examples of this can be found in the sample application `cjpeg`.
 
 The library maintains a count of the number of scanlines written so far
-in the next_scanline field of the JPEG object.  Usually you can just use
+in the `next_scanline` field of the JPEG object.  Usually you can just use
 this variable as the loop counter, so that the loop test looks like
-"while (cinfo.next_scanline < cinfo.image_height)".
+`while (cinfo.next_scanline < cinfo.image_height)`.
 
 Code for this step depends heavily on the way that you store the source data.
-example.c shows the following code for the case of a full-size 2-D source
+`example.c` shows the following code for the case of a full-size 2-D source
 array containing 3-byte RGB pixels:
 
-	JSAMPROW row_pointer[1];	/* pointer to a single row */
-	int row_stride;			/* physical row width in buffer */
+```c
+JSAMPROW row_pointer[1];	/* pointer to a single row */
+int row_stride;			/* physical row width in buffer */
 
-	row_stride = image_width * 3;	/* JSAMPLEs per row in image_buffer */
+row_stride = image_width * 3;	/* JSAMPLEs per row in image_buffer */
 
-	while (cinfo.next_scanline < cinfo.image_height) {
-	    row_pointer[0] = & image_buffer[cinfo.next_scanline * row_stride];
-	    jpeg_write_scanlines(&cinfo, row_pointer, 1);
-	}
+while (cinfo.next_scanline < cinfo.image_height) {
+	row_pointer[0] = & image_buffer[cinfo.next_scanline * row_stride];
+	jpeg_write_scanlines(&cinfo, row_pointer, 1);
+}
+```
 
-jpeg_write_scanlines() returns the number of scanlines actually written.
+`jpeg_write_scanlines()` returns the number of scanlines actually written.
 This will normally be equal to the number passed in, so you can usually
-ignore the return value.  It is different in just two cases:
-  * If you try to write more scanlines than the declared image height,
-    the additional scanlines are ignored.
-  * If you use a suspending data destination manager, output buffer overrun
-    will cause the compressor to return before accepting all the passed lines.
-    This feature is discussed under "I/O suspension", below.  The normal
-    stdio destination manager will NOT cause this to happen.
+ignore the return value.  It is different in just two cases:  
+&emsp;* If you try to write more scanlines than the declared image height,
+      the additional scanlines are ignored.  
+&emsp;* If you use a suspending data destination manager, output buffer overrun
+      will cause the compressor to return before accepting all the passed lines.
+      This feature is discussed under "I/O suspension", below.  The normal
+      stdio destination manager will NOT cause this to happen.  
 In any case, the return value is the same as the change in the value of
 next_scanline.
 
 
-6. jpeg_finish_compress(...);
+6. `jpeg_finish_compress(...);`
 
-After all the image data has been written, call jpeg_finish_compress() to
+After all the image data has been written, call `jpeg_finish_compress()` to
 complete the compression cycle.  This step is ESSENTIAL to ensure that the
 last bufferload of data is written to the data destination.
-jpeg_finish_compress() also releases working memory associated with the JPEG
+`jpeg_finish_compress()` also releases working memory associated with the JPEG
 object.
 
 Typical code:
 
-	jpeg_finish_compress(&cinfo);
+```c
+jpeg_finish_compress(&cinfo);
+```
 
-If using the stdio destination manager, don't forget to close the output
-stdio stream (if necessary) afterwards.
+If using the `stdio` destination manager, don't forget to close the output
+`stdio` stream (if necessary) afterwards.
 
 If you have requested a multi-pass operating mode, such as Huffman code
-optimization, jpeg_finish_compress() will perform the additional passes using
-data buffered by the first pass.  In this case jpeg_finish_compress() may take
+optimization, `jpeg_finish_compress()` will perform the additional passes using
+data buffered by the first pass.  In this case `jpeg_finish_compress()` may take
 quite a while to complete.  With the default compression parameters, this will
 not happen.
 
-It is an error to call jpeg_finish_compress() before writing the necessary
+It is an error to call `jpeg_finish_compress()` before writing the necessary
 total number of scanlines.  If you wish to abort compression, call
-jpeg_abort() as discussed below.
+`jpeg_abort()` as discussed below.
 
 After completing a compression cycle, you may dispose of the JPEG object
 as discussed next, or you may use it to compress another image.  In that case
@@ -456,29 +473,30 @@ destination manager, the new datastream will be written to the same target.
 If you do not change any JPEG parameters, the new datastream will be written
 with the same parameters as before.  Note that you can change the input image
 dimensions freely between cycles, but if you change the input colorspace, you
-should call jpeg_set_defaults() to adjust for the new colorspace; and then
+should call `jpeg_set_defaults()` to adjust for the new colorspace; and then
 you'll need to repeat all of step 3.
 
 
 7. Release the JPEG compression object.
 
 When you are done with a JPEG compression object, destroy it by calling
-jpeg_destroy_compress().  This will free all subsidiary memory (regardless of
-the previous state of the object).  Or you can call jpeg_destroy(), which
+`jpeg_destroy_compress()`.  This will free all subsidiary memory (regardless of
+the previous state of the object).  Or you can call `jpeg_destroy()`, which
 works for either compression or decompression objects --- this may be more
 convenient if you are sharing code between compression and decompression
 cases.  (Actually, these routines are equivalent except for the declared type
-of the passed pointer.  To avoid gripes from ANSI C compilers, jpeg_destroy()
-should be passed a j_common_ptr.)
+of the passed pointer.  To avoid gripes from ANSI C compilers, `jpeg_destroy()`
+should be passed a `j_common_ptr`.)
 
-If you allocated the jpeg_compress_struct structure from malloc(), freeing
-it is your responsibility --- jpeg_destroy() won't.  Ditto for the error
+If you allocated the jpeg_compress_struct structure from `malloc()`, freeing
+it is your responsibility --- `jpeg_destroy()` won't.  Ditto for the error
 handler structure.
 
 Typical code:
 
-	jpeg_destroy_compress(&cinfo);
-
+```c
+jpeg_destroy_compress(&cinfo);
+```
 
 8. Aborting.
 
@@ -486,20 +504,20 @@ If you decide to abort a compression cycle before finishing, you can clean up
 in either of two ways:
 
 * If you don't need the JPEG object any more, just call
-  jpeg_destroy_compress() or jpeg_destroy() to release memory.  This is
-  legitimate at any point after calling jpeg_create_compress() --- in fact,
-  it's safe even if jpeg_create_compress() fails.
+  `jpeg_destroy_compress()` or `jpeg_destroy()` to release memory.  This is
+  legitimate at any point after calling `jpeg_create_compress()` --- in fact,
+  it's safe even if `jpeg_create_compress()` fails.
 
-* If you want to re-use the JPEG object, call jpeg_abort_compress(), or call
-  jpeg_abort() which works on both compression and decompression objects.
+* If you want to re-use the JPEG object, call `jpeg_abort_compress()`, or call
+  `jpeg_abort()` which works on both compression and decompression objects.
   This will return the object to an idle state, releasing any working memory.
-  jpeg_abort() is allowed at any time after successful object creation.
+  `jpeg_abort()` is allowed at any time after successful object creation.
 
 Note that cleaning up the data destination, if required, is your
-responsibility; neither of these routines will call term_destination().
+responsibility; neither of these routines will call `term_destination()`.
 (See "Compressed data handling", below, for more about that.)
 
-jpeg_destroy() and jpeg_abort() are the only safe calls to make on a JPEG
+`jpeg_destroy()` and `jpeg_abort()` are the only safe calls to make on a JPEG
 object that has reported an error by calling error_exit (see "Error handling"
 for more info).  The internal state of such an object is likely to be out of
 whack.  Either of these two routines will return the object to a known state.
@@ -513,18 +531,20 @@ Here we revisit the JPEG decompression outline given in the overview.
 1. Allocate and initialize a JPEG decompression object.
 
 This is just like initialization for compression, as discussed above,
-except that the object is a "struct jpeg_decompress_struct" and you
-call jpeg_create_decompress().  Error handling is exactly the same.
+except that the object is a `struct jpeg_decompress_struct` and you
+call `jpeg_create_decompress()`.  Error handling is exactly the same.
 
 Typical code:
 
-	struct jpeg_decompress_struct cinfo;
-	struct jpeg_error_mgr jerr;
-	...
-	cinfo.err = jpeg_std_error(&jerr);
-	jpeg_create_decompress(&cinfo);
+```c
+struct jpeg_decompress_struct cinfo;
+struct jpeg_error_mgr jerr;
+...
+cinfo.err = jpeg_std_error(&jerr);
+jpeg_create_decompress(&cinfo);
+```
 
-(Both here and in the IJG code, we usually use variable name "cinfo" for
+(Both here and in the IJG code, we usually use variable name `cinfo` for
 both compression and decompression objects.)
 
 
@@ -532,66 +552,70 @@ both compression and decompression objects.)
 
 As previously mentioned, the JPEG library reads compressed data from a "data
 source" module.  The library includes one data source module which knows how
-to read from a stdio stream.  You can use your own source module if you want
+to read from a `stdio` stream.  You can use your own source module if you want
 to do something else, as discussed later.
 
-If you use the standard source module, you must open the source stdio stream
+If you use the standard source module, you must open the source `stdio` stream
 beforehand.  Typical code for this step looks like:
 
-	FILE * infile;
-	...
-	if ((infile = fopen(filename, "rb")) == NULL) {
-	    fprintf(stderr, "can't open %s\n", filename);
-	    exit(1);
-	}
-	jpeg_stdio_src(&cinfo, infile);
+```c
+FILE * infile;
+...
+if ((infile = fopen(filename, "rb")) == NULL) {
+	fprintf(stderr, "can't open %s\n", filename);
+	exit(1);
+}
+jpeg_stdio_src(&cinfo, infile);
+```
 
 where the last line invokes the standard source module.
 
 WARNING: it is critical that the binary compressed data be read unchanged.
-On non-Unix systems the stdio library may perform newline translation or
+On non-Unix systems the `stdio` library may perform newline translation or
 otherwise corrupt binary data.  To suppress this behavior, you may need to use
-a "b" option to fopen (as shown above), or use setmode() or another routine to
-put the stdio stream in binary mode.  See cjpeg.c and djpeg.c for code that
+a "b" option to `fopen` (as shown above), or use `setmode()` or another routine to
+put the `stdio` stream in binary mode.  See `cjpeg.c` and `djpeg.c` for code that
 has been found to work on many systems.
 
-You may not change the data source between calling jpeg_read_header() and
-jpeg_finish_decompress().  If you wish to read a series of JPEG images from
-a single source file, you should repeat the jpeg_read_header() to
-jpeg_finish_decompress() sequence without reinitializing either the JPEG
+You may not change the data source between calling `jpeg_read_header()` and
+`jpeg_finish_decompress()`.  If you wish to read a series of JPEG images from
+a single source file, you should repeat the `jpeg_read_header()` to
+`jpeg_finish_decompress()` sequence without reinitializing either the JPEG
 object or the data source module; this prevents buffered input data from
 being discarded.
 
 
-3. Call jpeg_read_header() to obtain image info.
+3. Call `jpeg_read_header()` to obtain image info.
 
 Typical code for this step is just
 
-	jpeg_read_header(&cinfo, TRUE);
+```c
+jpeg_read_header(&cinfo, TRUE);
+```
 
 This will read the source datastream header markers, up to the beginning
 of the compressed data proper.  On return, the image dimensions and other
 info have been stored in the JPEG object.  The application may wish to
 consult this information before selecting decompression parameters.
 
-More complex code is necessary if
-  * A suspending data source is used --- in that case jpeg_read_header()
-    may return before it has read all the header data.  See "I/O suspension",
-    below.  The normal stdio source manager will NOT cause this to happen.
-  * Abbreviated JPEG files are to be processed --- see the section on
-    abbreviated datastreams.  Standard applications that deal only in
-    interchange JPEG files need not be concerned with this case either.
+More complex code is necessary if  
+&emsp;* A suspending data source is used --- in that case `jpeg_read_header()`
+      may return before it has read all the header data.  See "I/O suspension",
+      below.  The normal stdio source manager will NOT cause this to happen.  
+&emsp;* Abbreviated JPEG files are to be processed --- see the section on
+      abbreviated datastreams.  Standard applications that deal only in
+      interchange JPEG files need not be concerned with this case either.
 
 It is permissible to stop at this point if you just wanted to find out the
 image dimensions and other header info for a JPEG file.  In that case,
-call jpeg_destroy() when you are done with the JPEG object, or call
-jpeg_abort() to return it to an idle state before selecting a new data
+call `jpeg_destroy()` when you are done with the JPEG object, or call
+`jpeg_abort()` to return it to an idle state before selecting a new data
 source and reading another header.
 
 
 4. Set parameters for decompression.
 
-jpeg_read_header() sets appropriate default decompression parameters based on
+`jpeg_read_header()` sets appropriate default decompression parameters based on
 the properties of the image (in particular, its colorspace).  However, you
 may well want to alter these defaults before beginning the decompression.
 For example, the default is to produce full color output from a color file.
@@ -601,62 +625,66 @@ selected.  "Decompression parameter selection", below, gives details.
 
 If the defaults are appropriate, nothing need be done at this step.
 
-Note that all default values are set by each call to jpeg_read_header().
+Note that all default values are set by each call to `jpeg_read_header()`.
 If you reuse a decompression object, you cannot expect your parameter
 settings to be preserved across cycles, as you can for compression.
 You must set desired parameter values each time.
 
 
-5. jpeg_start_decompress(...);
+5. `jpeg_start_decompress(...);`
 
-Once the parameter values are satisfactory, call jpeg_start_decompress() to
+Once the parameter values are satisfactory, call `jpeg_start_decompress()` to
 begin decompression.  This will initialize internal state, allocate working
 memory, and prepare for returning data.
 
 Typical code is just
 
-	jpeg_start_decompress(&cinfo);
+```c
+jpeg_start_decompress(&cinfo);
+```
 
 If you have requested a multi-pass operating mode, such as 2-pass color
-quantization, jpeg_start_decompress() will do everything needed before data
-output can begin.  In this case jpeg_start_decompress() may take quite a while
+quantization, `jpeg_start_decompress()` will do everything needed before data
+output can begin.  In this case `jpeg_start_decompress()` may take quite a while
 to complete.  With a single-scan (non progressive) JPEG file and default
-decompression parameters, this will not happen; jpeg_start_decompress() will
+decompression parameters, this will not happen; `jpeg_start_decompress()` will
 return quickly.
 
 After this call, the final output image dimensions, including any requested
 scaling, are available in the JPEG object; so is the selected colormap, if
 colormapped output has been requested.  Useful fields include
 
-	output_width		image width and height, as scaled
-	output_height
-	out_color_components	# of color components in out_color_space
-	output_components	# of color components returned per pixel
-	colormap		the selected colormap, if any
-	actual_number_of_colors		number of entries in colormap
+```c
+output_width            image width and height, as scaled
+output_height
+out_color_components    # of color components in out_color_space
+output_components       # of color components returned per pixel
+colormap                the selected colormap, if any
+actual_number_of_colors number of entries in colormap
+```
 
-output_components is 1 (a colormap index) when quantizing colors; otherwise it
-equals out_color_components.  It is the number of JSAMPLE values that will be
+`output_components` is 1 (a colormap index) when quantizing colors; otherwise it
+equals `out_color_components`.  It is the number of JSAMPLE values that will be
 emitted per pixel in the output arrays.
 
 Typically you will need to allocate data buffers to hold the incoming image.
-You will need output_width * output_components JSAMPLEs per scanline in your
-output buffer, and a total of output_height scanlines will be returned.
+You will need `output_width * output_components` `JSAMPLEs` per scanline in your
+output buffer, and a total of `output_height` scanlines will be returned.
 
 Note: if you are using the JPEG library's internal memory manager to allocate
-data buffers (as djpeg does), then the manager's protocol requires that you
-request large buffers *before* calling jpeg_start_decompress().  This is a
-little tricky since the output_XXX fields are not normally valid then.  You
-can make them valid by calling jpeg_calc_output_dimensions() after setting the
+data buffers (as `djpeg` does), then the manager's protocol requires that you
+request large buffers *before* calling `jpeg_start_decompress()`.  This is a
+little tricky since the `output_XXX` fields are not normally valid then.  You
+can make them valid by calling `jpeg_calc_output_dimensions()` after setting the
 relevant parameters (scaling, output color space, and quantization flag).
 
 
-6. while (scan lines remain to be read)
-	jpeg_read_scanlines(...);
+6.  `while (scan lines remain to be read)`
+    `jpeg_read_scanlines(...);`
 
-Now you can read the decompressed image data by calling jpeg_read_scanlines()
+Now you can read the decompressed image data by calling `jpeg_read_scanlines()`
 one or more times.  At each call, you pass in the maximum number of scanlines
-to be read (ie, the height of your working buffer); jpeg_read_scanlines()
+to be read (ie, the height of your working buffer); `jpeg_read_scanlines()`
 will return up to that many lines.  The return value is the number of lines
 actually read.  The format of the returned data is discussed under "Data
 formats", above.  Don't forget that grayscale and color JPEGs will return
@@ -665,43 +693,45 @@ different data formats!
 Image data is returned in top-to-bottom scanline order.  If you must write
 out the image in bottom-to-top order, you can use the JPEG library's virtual
 array mechanism to invert the data efficiently.  Examples of this can be
-found in the sample application djpeg.
+found in the sample application `djpeg`.
 
 The library maintains a count of the number of scanlines returned so far
-in the output_scanline field of the JPEG object.  Usually you can just use
+in the `output_scanline` field of the JPEG object.  Usually you can just use
 this variable as the loop counter, so that the loop test looks like
-"while (cinfo.output_scanline < cinfo.output_height)".  (Note that the test
-should NOT be against image_height, unless you never use scaling.  The
-image_height field is the height of the original unscaled image.)
-The return value always equals the change in the value of output_scanline.
+`while (cinfo.output_scanline < cinfo.output_height)`.  (Note that the test
+should NOT be against `image_height`, unless you never use scaling.  The
+`image_height` field is the height of the original unscaled image.)
+The return value always equals the change in the value of `output_scanline`.
 
 If you don't use a suspending data source, it is safe to assume that
-jpeg_read_scanlines() reads at least one scanline per call, until the
+`jpeg_read_scanlines()` reads at least one scanline per call, until the
 bottom of the image has been reached.
 
 If you use a buffer larger than one scanline, it is NOT safe to assume that
-jpeg_read_scanlines() fills it.  (The current implementation returns only a
+`jpeg_read_scanlines()` fills it.  (The current implementation returns only a
 few scanlines per call, no matter how large a buffer you pass.)  So you must
-always provide a loop that calls jpeg_read_scanlines() repeatedly until the
+always provide a loop that calls `jpeg_read_scanlines()` repeatedly until the
 whole image has been read.
 
 
-7. jpeg_finish_decompress(...);
+7. `jpeg_finish_decompress(...);`
 
-After all the image data has been read, call jpeg_finish_decompress() to
+After all the image data has been read, call `jpeg_finish_decompress()` to
 complete the decompression cycle.  This causes working memory associated
 with the JPEG object to be released.
 
 Typical code:
 
-	jpeg_finish_decompress(&cinfo);
+```c
+jpeg_finish_decompress(&cinfo);
+```
 
-If using the stdio source manager, don't forget to close the source stdio
+If using the `stdio` source manager, don't forget to close the source `stdio`
 stream if necessary.
 
-It is an error to call jpeg_finish_decompress() before reading the correct
+It is an error to call `jpeg_finish_decompress()` before reading the correct
 total number of scanlines.  If you wish to abort decompression, call
-jpeg_abort() as discussed below.
+`jpeg_abort()` as discussed below.
 
 After completing a decompression cycle, you may dispose of the JPEG object as
 discussed next, or you may use it to decompress another image.  In that case
@@ -712,44 +742,46 @@ manager, the next image will be read from the same source.
 8. Release the JPEG decompression object.
 
 When you are done with a JPEG decompression object, destroy it by calling
-jpeg_destroy_decompress() or jpeg_destroy().  The previous discussion of
+`jpeg_destroy_decompress()` or `jpeg_destroy()`.  The previous discussion of
 destroying compression objects applies here too.
 
 Typical code:
 
-	jpeg_destroy_decompress(&cinfo);
+```c
+jpeg_destroy_decompress(&cinfo);
+```
 
 
 9. Aborting.
 
-You can abort a decompression cycle by calling jpeg_destroy_decompress() or
-jpeg_destroy() if you don't need the JPEG object any more, or
-jpeg_abort_decompress() or jpeg_abort() if you want to reuse the object.
+You can abort a decompression cycle by calling `jpeg_destroy_decompress()` or
+`jpeg_destroy()` if you don't need the JPEG object any more, or
+`jpeg_abort_decompress()` or `jpeg_abort()` if you want to reuse the object.
 The previous discussion of aborting compression cycles applies here too.
 
 
 Mechanics of usage: include files, linking, etc
 -----------------------------------------------
 
-Applications using the JPEG library should include the header file jpeglib.h
+Applications using the JPEG library should include the header file `jpeglib.h`
 to obtain declarations of data types and routines.  Before including
-jpeglib.h, include system headers that define at least the typedefs FILE and
-size_t.  On ANSI-conforming systems, including <stdio.h> is sufficient; on
-older Unix systems, you may need <sys/types.h> to define size_t.
+`jpeglib.h`, include system headers that define at least the typedefs `FILE` and
+`size_t`.  On ANSI-conforming systems, including `<stdio.h>` is sufficient; on
+older Unix systems, you may need `<sys/types.h>` to define `size_t`.
 
 If the application needs to refer to individual JPEG library error codes, also
-include jerror.h to define those symbols.
+include `jerror.h` to define those symbols.
 
-jpeglib.h indirectly includes the files jconfig.h and jmorecfg.h.  If you are
+`jpeglib.h` indirectly includes the files `jconfig.h` and `jmorecfg.h`.  If you are
 installing the JPEG header files in a system directory, you will want to
-install all four files: jpeglib.h, jerror.h, jconfig.h, jmorecfg.h.
+install all four files: `jpeglib.h`, `jerror.h`, `jconfig.h`, `jmorecfg.h`.
 
 The most convenient way to include the JPEG code into your executable program
-is to prepare a library file ("libjpeg.a", or a corresponding name on non-Unix
+is to prepare a library file (`libjpeg.a`, or a corresponding name on non-Unix
 machines) and reference it at your link step.  If you use only half of the
 library (only compression or only decompression), only that much code will be
 included from the library, unless your linker is hopelessly brain-damaged.
-The supplied makefiles build libjpeg.a automatically (see install.txt).
+The supplied `makefiles` build `libjpeg.a` automatically (see `install.txt`).
 
 While you can build the JPEG library as a shared library if the whim strikes
 you, we don't really recommend it.  The trouble with shared libraries is that
@@ -764,16 +796,16 @@ however.)
 
 On some systems your application may need to set up a signal handler to ensure
 that temporary files are deleted if the program is interrupted.  This is most
-critical if you are on MS-DOS and use the jmemdos.c memory manager back end;
+critical if you are on MS-DOS and use the `jmemdos.c` memory manager back end;
 it will try to grab extended memory for temp files, and that space will NOT be
-freed automatically.  See cjpeg.c or djpeg.c for an example signal handler.
+freed automatically.  See `cjpeg.c` or `djpeg.c` for an example signal handler.
 
 It may be worth pointing out that the core JPEG library does not actually
-require the stdio library: only the default source/destination managers and
+require the `stdio` library: only the default source/destination managers and
 error handler need it.  You can use the library in a stdio-less environment
-if you replace those modules and use jmemnobs.c (or another memory manager of
+if you replace those modules and use `jmemnobs.c` (or another memory manager of
 your own devising).  More info about the minimum system library requirements
-may be found in jinclude.h.
+may be found in `jinclude.h`.
 
 
 ADVANCED FEATURES
