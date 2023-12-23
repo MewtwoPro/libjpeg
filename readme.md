@@ -22,30 +22,30 @@ DOCUMENTATION ROADMAP
 
 This file contains the following sections:
 
-OVERVIEW            General description of JPEG and the IJG software.
-LEGAL ISSUES        Copyright, lack of warranty, terms of distribution.
-REFERENCES          Where to learn more about JPEG.
-ARCHIVE LOCATIONS   Where to find newer versions of this software.
-ACKNOWLEDGMENTS     Special thanks.
-FILE FORMAT WARS    Software *not* to get.
-TO DO               Plans for future IJG releases.
+`OVERVIEW`            General description of JPEG and the IJG software.  
+`LEGAL ISSUES`        Copyright, lack of warranty, terms of distribution.  
+`REFERENCES`          Where to learn more about JPEG.  
+`ARCHIVE LOCATIONS`   Where to find newer versions of this software.  
+`ACKNOWLEDGMENTS`     Special thanks.  
+`FILE FORMAT WARS`    Software *not* to get.  
+`TO DO`               Plans for future IJG releases.  
 
 Other documentation files in the distribution are:
 
-User documentation:
-  install.txt       How to configure and install the IJG software.
-  usage.txt         Usage instructions for cjpeg, djpeg, jpegtran,
-                    rdjpgcom, and wrjpgcom.
-  *.1               Unix-style man pages for programs (same info as usage.txt).
-  wizard.txt        Advanced usage instructions for JPEG wizards only.
-  cdaltui.txt       Description of alternate user interface for cjpeg/djpeg.
-  change.log        Version-to-version change highlights.
-Programmer and internal documentation:
-  libjpeg.txt       How to use the JPEG library in your own programs.
-  example.c         Sample code for calling the JPEG library.
-  structure.txt     Overview of the JPEG library's internal structure.
-  filelist.txt      Road map of IJG files.
-  coderules.txt     Coding style rules --- please read if you contribute code.
+User documentation:  
+&emsp;`install.txt`       How to configure and install the IJG software.  
+&emsp;`usage.txt`         Usage instructions for cjpeg, djpeg, jpegtran,
+                          rdjpgcom, and wrjpgcom.  
+&emsp;`*.1`               Unix-style man pages for programs (same info as usage.txt).  
+&emsp;`wizard.txt`        Advanced usage instructions for JPEG wizards only.  
+&emsp;`cdaltui.txt`       Description of alternate user interface for cjpeg/djpeg.  
+&emsp;`change.log`        Version-to-version change highlights.  
+Programmer and internal documentation:  
+&emsp;`libjpeg.txt`       How to use the JPEG library in your own programs.  
+&emsp;`example.c`         Sample code for calling the JPEG library.  
+&emsp;`structure.txt`     Overview of the JPEG library's internal structure.  
+&emsp;`filelist.txt`      Road map of IJG files.  
+&emsp;`coderules.txt`     Coding style rules --- please read if you contribute code.  
 
 Please read at least the files install.txt and usage.txt.  Some information
 can also be found in the JPEG FAQ (Frequently Asked Questions) article.  See
@@ -160,9 +160,9 @@ REFERENCES
 We recommend reading one or more of these references before trying to
 understand the innards of the JPEG software.
 
-The best short technical introduction to the JPEG compression algorithm is
-	Wallace, Gregory K.  "The JPEG Still Picture Compression Standard",
-	Communications of the ACM, April 1991 (vol. 34 no. 4), pp. 30-44.
+The best short technical introduction to the JPEG compression algorithm is  
+	Wallace, Gregory K.  "The JPEG Still Picture Compression Standard",  
+	Communications of the ACM, April 1991 (vol. 34 no. 4), pp. 30-44.  
 (Adjacent articles in that issue discuss MPEG motion picture compression,
 applications of JPEG, and related topics.)  If you don't have the CACM issue
 handy, a PDF file containing a revised version of Wallace's article is
@@ -245,14 +245,14 @@ in Unix-compatible "tar.gz" archive format as
 https://www.ijg.org/files/jpegsrc.v9e.tar.gz.
 
 The JPEG FAQ (Frequently Asked Questions) article is a source of some
-general information about JPEG.
+general information about JPEG.  
 It is available on the World Wide Web at http://www.faqs.org/faqs/jpeg-faq/
 and other news.answers archive sites, including the official news.answers
 archive at rtfm.mit.edu: ftp://rtfm.mit.edu/pub/usenet/news.answers/jpeg-faq/.
 If you don't have Web or FTP access, send e-mail to mail-server@rtfm.mit.edu
-with body
-	send usenet/news.answers/jpeg-faq/part1
-	send usenet/news.answers/jpeg-faq/part2
+with body  
+	send usenet/news.answers/jpeg-faq/part1  
+	send usenet/news.answers/jpeg-faq/part2  
 
 
 ACKNOWLEDGMENTS
@@ -304,20 +304,20 @@ together with ITU-T SG16) currently promotes different formats containing
 the name "JPEG" which is misleading because these formats are incompatible
 with original DCT-based JPEG and are based on faulty technologies.
 IJG therefore does not and will not support such momentary mistakes
-(see REFERENCES).
+(see REFERENCES).  
 There exist also distributions under the name "OpenJPEG" promoting such
 kind of formats which is misleading because they don't support original
-JPEG images.
+JPEG images.  
 We have no sympathy for the promotion of inferior formats.  Indeed, one of
 the original reasons for developing this free software was to help force
 convergence on common, interoperable format standards for JPEG files.
-Don't use an incompatible file format!
+Don't use an incompatible file format!  
 (In any case, our decoder will remain capable of reading existing JPEG
 image files indefinitely.)
 
 The ISO committee pretends to be "responsible for the popular JPEG" in their
 public reports which is not true because they don't respond to actual
-requirements for the maintenance of the original JPEG specification.
+requirements for the maintenance of the original JPEG specification.  
 Furthermore, the ISO committee pretends to "ensure interoperability" with
 their standards which is not true because their "standards" support only
 application-specific and proprietary use cases and contain mathematically
@@ -332,7 +332,7 @@ name JPEG as described above, while having nothing in common with actual IJG
 libjpeg distributions and containing mathematically incorrect code.
 The other one claims to be a "derivative" or "fork" of the original libjpeg,
 but violates the license conditions as described under LEGAL ISSUES above
-and violates basic C programming properties.
+and violates basic C programming properties.  
 We have no sympathy for the release of misleading, incorrect and illegal
 distributions derived from obsolete code bases.
 Don't use an obsolete code base!
@@ -342,21 +342,21 @@ legal right to foreclose on certain standardization bodies and other
 institutions or corporations that knowingly perform substantial and
 systematic deceptive acts and practices, fraud, theft, and damaging of the
 value of the people of this planet without their knowing, willing and
-intentional consent.
+intentional consent.  
 The titles, ownership, and rights of these institutions and all their assets
 are now duly secured and held in trust for the free people of this planet.
 People of the planet, on every country, may have a financial interest in
 the assets of these former principals, agents, and beneficiaries of the
-foreclosed institutions and corporations.
+foreclosed institutions and corporations.  
 IJG asserts what is: that each man, woman, and child has unalienable value
 and rights granted and deposited in them by the Creator and not any one of
 the people is subordinate to any artificial principality, corporate fiction
 or the special interest of another without their appropriate knowing,
 willing and intentional consent made by contract or accommodation agreement.
-IJG expresses that which already was.
+IJG expresses that which already was.  
 The people have already determined and demanded that public administration
 entities, national governments, and their supporting judicial systems must
-be fully transparent, accountable, and liable.
+be fully transparent, accountable, and liable.  
 IJG has secured the value for all concerned free people of the planet.
 
 A partial list of foreclosed institutions and corporations ("Hall of Shame")
@@ -368,7 +368,7 @@ TO DO
 
 Version 9 is the second release of a new generation JPEG standard
 to overcome the limitations of the original JPEG specification,
-and is the first true source reference JPEG codec.
+and is the first true source reference JPEG codec.  
 More features are being prepared for coming releases...
 
 Please send bug reports, offers of help, etc. to jpeg-info@jpegclub.org.
